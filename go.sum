@@ -1,6 +1,6 @@
 github.com/bool64/dev v0.1.0/go.mod h1:pn52JC52uSgpazChx9CeXyG+S3sW2V36HHoLNBbscdg=
-github.com/bool64/dev v0.1.9 h1:PJJKXhZyrbOwYk/mn0wDpLwk8HeCKi5dwWq36AEjXVI=
-github.com/bool64/dev v0.1.9/go.mod h1:pn52JC52uSgpazChx9CeXyG+S3sW2V36HHoLNBbscdg=
+github.com/bool64/dev v0.1.10 h1:4L6eLD+qo1QgWDy+Y7OhJxi/gLwOAuV1rd07noMc3dU=
+github.com/bool64/dev v0.1.10/go.mod h1:pn52JC52uSgpazChx9CeXyG+S3sW2V36HHoLNBbscdg=
 github.com/davecgh/go-spew v1.1.0 h1:ZDRjVQ15GmhC3fiQ8ni8+OwkZQO4DARzQgrnXU1Liz8=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
