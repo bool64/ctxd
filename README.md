@@ -21,7 +21,7 @@ that is built around awesome [`go.uber.org/zap`](https://pkg.go.dev/go.uber.org/
 ### Structured Logging
 
 ```go
-logger := testLogger{}
+logger := ctxd.LoggerMock{}
 
 // Once instrumented context can aid logger with structured information.
 ctx := ctxd.AddFields(context.Background(), "foo", "bar")
@@ -42,9 +42,9 @@ fmt.Print(logger.String())
 Logger can be instrumented with persistent fields that are affecting every context.
 
 ```go
-tl := testLogger{}
+lm := ctxd.LoggerMock{}
 
-var globalLogger ctxd.Logger = &tl
+var globalLogger ctxd.Logger = &lm
 
 localLogger := ctxd.LoggerWithFields(globalLogger, "local", 123)
 
@@ -57,7 +57,7 @@ ctx2 := ctxd.AddFields(context.Background(), "ctx", 2)
 localLogger.Info(ctx1, "hello", "he", "lo")
 localLogger.Warn(ctx2, "bye", "by", "ee")
 
-fmt.Print(tl.String())
+fmt.Print(lm.String())
 
 // Output:
 // info: hello {"ctx":1,"foo":"bar","he":"lo","local":123}
@@ -88,8 +88,8 @@ err2 := ctxd.WrapError(
 
 // Setup your logger.
 var (
-    tl                 = testLogger{}
-    logger ctxd.Logger = &tl
+    lm                 = ctxd.LoggerMock{}
+    logger ctxd.Logger = &lm
 )
 
 // Inspect error fields.
@@ -101,7 +101,7 @@ if errors.As(err, &se) {
 // Log errors.
 ctxd.LogError(ctx, err, logger.Error)
 ctxd.LogError(ctx, err2, logger.Warn)
-fmt.Print(tl.String())
+fmt.Print(lm.String())
 
 // Output:
 // error fields: map[field1:1 field2:abc field3:3]

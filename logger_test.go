@@ -1,65 +1,15 @@
 package ctxd_test
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
 	"testing"
 
 	"github.com/bool64/ctxd"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
-type testLogger struct {
-	bytes.Buffer
-	TB testing.TB
-}
-
-func (t *testLogger) log(ctx context.Context, level, msg string, keysAndValues []interface{}) {
-	jm, err := json.Marshal(ctxd.Tuples(append(ctxd.Fields(ctx), keysAndValues...)).Fields())
-	require.NoError(t.TB, err)
-
-	out := ctxd.LogWriter(ctx)
-	if out == nil {
-		out = t
-	}
-
-	if ctxd.IsDebug(ctx) {
-		_, err = out.Write([]byte("debug mode, "))
-		require.NoError(t.TB, err)
-	}
-
-	_, err = out.Write([]byte(level + ": " + msg + " "))
-	require.NoError(t.TB, err)
-	_, err = out.Write(jm)
-	require.NoError(t.TB, err)
-	_, err = out.Write([]byte("\n"))
-	require.NoError(t.TB, err)
-}
-
-func (t *testLogger) Debug(ctx context.Context, msg string, keysAndValues ...interface{}) {
-	t.log(ctx, "debug", msg, keysAndValues)
-}
-
-func (t *testLogger) Info(ctx context.Context, msg string, keysAndValues ...interface{}) {
-	t.log(ctx, "info", msg, keysAndValues)
-}
-
-func (t *testLogger) Important(ctx context.Context, msg string, keysAndValues ...interface{}) {
-	t.log(ctx, "important", msg, keysAndValues)
-}
-
-func (t *testLogger) Warn(ctx context.Context, msg string, keysAndValues ...interface{}) {
-	t.log(ctx, "warn", msg, keysAndValues)
-}
-
-func (t *testLogger) Error(ctx context.Context, msg string, keysAndValues ...interface{}) {
-	t.log(ctx, "error", msg, keysAndValues)
-}
-
 func TestWithFields(t *testing.T) {
-	l := testLogger{}
+	l := ctxd.LoggerMock{}
 	w := ctxd.LoggerWithFields(&l, "key1", 1, "key2", "abc")
 	ctx := ctxd.AddFields(context.Background(), "key3", 3)
 
