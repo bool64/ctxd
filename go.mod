@@ -1,6 +1,6 @@
 module github.com/bool64/ctxd
 
-go 1.15
+go 1.13
 
 require (
 	github.com/bool64/dev v0.1.10-0.20201128090505-c7f66f197538
