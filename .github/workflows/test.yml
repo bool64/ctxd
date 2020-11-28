@@ -23,7 +23,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Restore vendor
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: vendor
           key: ${{ runner.os }}-go-vendor-${{ hashFiles('**/go.mod') }}
