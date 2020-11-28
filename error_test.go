@@ -32,7 +32,7 @@ func TestWrap(t *testing.T) {
 	logOut := &bytes.Buffer{}
 	ctx = ctxd.WithLogWriter(ctx, logOut)
 
-	logger := testLogger{}
+	logger := ctxd.LoggerMock{}
 
 	ctxd.LogError(ctx, err, logger.Error)
 
@@ -166,7 +166,7 @@ func TestLog(t *testing.T) {
 	logOut := &bytes.Buffer{}
 	ctx = ctxd.WithLogWriter(ctx, logOut)
 
-	logger := testLogger{}
+	logger := ctxd.LoggerMock{}
 
 	err := ctxd.NewError(ctx, "failed", "id", 123)
 	assert.NotNil(t, err)
