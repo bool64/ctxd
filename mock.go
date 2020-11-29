@@ -4,10 +4,12 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"sync"
 )
 
 // LoggerMock logs messages to internal buffer.
 type LoggerMock struct {
+	mu sync.Mutex
 	bytes.Buffer
 	OnError func(err error)
 }
@@ -29,6 +31,9 @@ func (m *LoggerMock) failed(err error) bool {
 }
 
 func (m *LoggerMock) log(ctx context.Context, level, msg string, keysAndValues []interface{}) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
 	jm, err := json.Marshal(Tuples(append(Fields(ctx), keysAndValues...)).Fields())
 	if m.failed(err) {
 		return
