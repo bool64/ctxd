@@ -73,14 +73,9 @@ func WrapError(ctx context.Context, err error, message string, keysAndValues ...
 		}
 	}
 
-	se, ok := newError(ctx, err, keysAndValues...)
-	if ok {
-		return wrappedStructuredError{
-			structuredError: se,
-		}
+	return wrappedStructuredError{
+		structuredError: newError(ctx, err, keysAndValues...),
 	}
-
-	return err
 }
 
 // NewError creates error with optional structured data.
@@ -88,14 +83,7 @@ func WrapError(ctx context.Context, err error, message string, keysAndValues ...
 // LogError fields from context are also added to error structured data.
 func NewError(ctx context.Context, message string, keysAndValues ...interface{}) error {
 	// nolint:goerr113 // Static errors can be used with WrapError.
-	err := errors.New(message)
-
-	se, ok := newError(ctx, err, keysAndValues...)
-	if ok {
-		return se
-	}
-
-	return err
+	return newError(ctx, errors.New(message), keysAndValues...)
 }
 
 // Tuples is a slice of keys and values, e.g. {"key1", 1, "key2", "val2"}.
@@ -104,6 +92,7 @@ type Tuples []interface{}
 type structuredError struct {
 	err           error
 	keysAndValues Tuples
+	*stack
 }
 
 type wrappedStructuredError struct {
@@ -182,7 +171,7 @@ func (se structuredError) Tuples() []interface{} {
 	return se.keysAndValues[0:len(se.keysAndValues):len(se.keysAndValues)]
 }
 
-func newError(ctx context.Context, err error, keysAndValues ...interface{}) (structuredError, bool) {
+func newError(ctx context.Context, err error, keysAndValues ...interface{}) structuredError {
 	var (
 		se        StructuredError
 		kv        = keysAndValues
@@ -204,14 +193,11 @@ func newError(ctx context.Context, err error, keysAndValues ...interface{}) (str
 		kv = append(kv, ctxFields...)
 	}
 
-	if len(kv) > 1 {
-		return structuredError{
-			err:           err,
-			keysAndValues: kv,
-		}, true
+	return structuredError{
+		err:           err,
+		keysAndValues: kv,
+		stack:         callers(),
 	}
-
-	return structuredError{}, false
 }
 
 var (

@@ -43,4 +43,7 @@ issues:
         - funlen
         - dupl
       path: "_test.go"
+    - linters:
+        - errcheck
+      source: "_, _ = io.WriteString\\(s" # stack.go fmt functions
 
