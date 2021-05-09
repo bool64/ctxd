@@ -5,13 +5,21 @@ import (
 	"context"
 	"encoding/json"
 	"sync"
+	"time"
 )
 
 // LoggerMock logs messages to internal buffer.
 type LoggerMock struct {
-	mu sync.Mutex
-	bytes.Buffer
 	OnError func(err error)
+
+	sync.Mutex
+	bytes.Buffer
+	LoggedEntries []struct {
+		Time    time.Time              `json:"time"`
+		Level   string                 `json:"level"`
+		Message string                 `json:"message"`
+		Data    map[string]interface{} `json:"data,omitempty"`
+	}
 }
 
 func (m *LoggerMock) failed(err error) bool {
@@ -31,13 +39,22 @@ func (m *LoggerMock) failed(err error) bool {
 }
 
 func (m *LoggerMock) log(ctx context.Context, level, msg string, keysAndValues []interface{}) {
-	m.mu.Lock()
-	defer m.mu.Unlock()
+	m.Lock()
+	defer m.Unlock()
 
-	jm, err := json.Marshal(Tuples(append(Fields(ctx), keysAndValues...)).Fields())
+	data := Tuples(append(Fields(ctx), keysAndValues...)).Fields()
+
+	jm, err := json.Marshal(data)
 	if m.failed(err) {
 		return
 	}
+
+	m.LoggedEntries = append(m.LoggedEntries, struct {
+		Time    time.Time              `json:"time"`
+		Level   string                 `json:"level"`
+		Message string                 `json:"message"`
+		Data    map[string]interface{} `json:"data,omitempty"`
+	}{Time: time.Now(), Level: level, Message: msg, Data: data})
 
 	out := LogWriter(ctx)
 	if out == nil {
