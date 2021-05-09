@@ -45,6 +45,7 @@ error: error message {"bar":2,"baz":3,"foo":1}
 important: important message {"bar":2,"baz":3,"foo":1}`+"\n", m.String(), m.String())
 
 	data := map[string]interface{}{"bar": 2, "baz": 3, "foo": 1}
+
 	assert.Equal(t, "debug message", m.LoggedEntries[0].Message)
 	assert.Equal(t, data, m.LoggedEntries[0].Data)
 	assert.Equal(t, "info message", m.LoggedEntries[1].Message)
