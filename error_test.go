@@ -222,3 +222,28 @@ func BenchmarkWrapError(b *testing.B) {
 	}
 	ctxd.LogError(ctx, err, logFunc)
 }
+
+func TestSentinelError_Error(t *testing.T) {
+	assert.EqualError(t, ctxd.SentinelError("failed"), "failed")
+}
+
+func TestLabeledError(t *testing.T) {
+	err1 := errors.New("failed")
+	label1 := ctxd.SentinelError("miserably")
+	label2 := ctxd.SentinelError("hopelessly")
+
+	err := ctxd.LabeledError(fmt.Errorf("oops: %w", err1), label1, label2)
+
+	assert.True(t, errors.Is(err, err1))
+	assert.True(t, errors.Is(err, label1))
+	assert.True(t, errors.Is(err, label2))
+
+	// Labels do not implicitly contribute to error message.
+	assert.Equal(t, "oops: failed", err.Error())
+
+	// If there are two matches, only first is returned.
+	var se ctxd.SentinelError
+
+	assert.True(t, errors.As(err, &se))
+	assert.Equal(t, "miserably", string(se))
+}

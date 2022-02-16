@@ -92,3 +92,32 @@ func ExampleWrapError() {
 	// error: something failed {"field1":1,"field2":"abc","field3":3}
 	// warn: wrapped: something failed {"field1":1,"field2":"abc","field3":3,"field4":true,"field5":"V"}
 }
+
+func ExampleLabeledError() {
+	err1 := errors.New("failed")
+	label1 := ctxd.SentinelError("miserably")
+	label2 := ctxd.SentinelError("hopelessly")
+
+	err := ctxd.LabeledError(fmt.Errorf("oops: %w", err1), label1, label2)
+
+	fmt.Println("err is err1:", errors.Is(err, err1))
+	fmt.Println("err is label1:", errors.Is(err, label1))
+	fmt.Println("err is label2:", errors.Is(err, label2))
+
+	// Labels do not implicitly contribute to error message.
+	fmt.Println("error message:", err.Error())
+
+	// If there are two matches, only first is returned.
+	var se ctxd.SentinelError
+
+	fmt.Println("err as &se:", errors.As(err, &se))
+	fmt.Println("err as value:", string(se))
+
+	// Output:
+	// err is err1: true
+	// err is label1: true
+	// err is label2: true
+	// error message: oops: failed
+	// err as &se: true
+	// err as value: miserably
+}
