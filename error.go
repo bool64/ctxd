@@ -226,3 +226,69 @@ func (se structuredError) MarshalText() ([]byte, error) {
 func (se structuredError) MarshalJSON() ([]byte, error) {
 	return json.Marshal(se.err.Error())
 }
+
+// SentinelError is a constant error.
+type SentinelError string
+
+// Error returns error message.
+func (e SentinelError) Error() string {
+	return string(e)
+}
+
+// LabeledError adds indicative errors to an error wrap.
+//
+// Labels could be checked with errors.Is, errors.As.
+// Error message remains the same with original error.
+func LabeledError(err error, labels ...error) error {
+	return labeledError{
+		err:    err,
+		labels: labels,
+	}
+}
+
+type labeledError struct {
+	err    error
+	labels []error
+}
+
+// Error returns message.
+func (le labeledError) Error() string {
+	return le.err.Error()
+}
+
+// Is returns true if err matches original error or any of labels.
+func (le labeledError) Is(err error) bool {
+	if errors.Is(le.err, err) {
+		return true
+	}
+
+	for _, l := range le.labels {
+		if errors.Is(err, l) {
+			return true
+		}
+	}
+
+	return false
+}
+
+// As returns true if original error or any of labels can be assigned to v.
+//
+// If multiple assignations are possible, only first one is performed.
+func (le labeledError) As(v interface{}) bool {
+	if errors.As(le.err, v) {
+		return true
+	}
+
+	for _, l := range le.labels {
+		if errors.As(l, v) {
+			return true
+		}
+	}
+
+	return false
+}
+
+// Unwrap returns original error.
+func (le labeledError) Unwrap() error {
+	return le.err
+}
