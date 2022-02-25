@@ -1,6 +1,5 @@
 # Contextualized Structured Logging and Error Handling for Go
 
-
 This library provides context-driven structured error and logger contracts.
 
 [![Build Status](https://github.com/bool64/ctxd/workflows/test/badge.svg)](https://github.com/bool64/ctxd/actions?query=branch%3Amaster+workflow%3Atest)
