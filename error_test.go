@@ -176,7 +176,7 @@ func TestLog(t *testing.T) {
 	ctxd.LogError(ctx, ctxd.NewError(ctx, "failed with no fields"), logger.Error)
 	assert.Equal(t,
 		`error: failed {"id":123}
-error: failed with no fields {}
+error: failed with no fields null
 `,
 		logOut.String())
 }
