@@ -176,7 +176,7 @@ func TestLog(t *testing.T) {
 	ctxd.LogError(ctx, ctxd.NewError(ctx, "failed with no fields"), logger.Error)
 	assert.Equal(t,
 		`error: failed {"id":123}
-error: failed with no fields {}
+error: failed with no fields null
 `,
 		logOut.String())
 }
@@ -246,4 +246,16 @@ func TestLabeledError(t *testing.T) {
 
 	assert.True(t, errors.As(err, &se))
 	assert.Equal(t, "miserably", string(se))
+}
+
+func TestTuples_Fields(t *testing.T) {
+	assert.Equal(t, map[string]interface{}(nil), ctxd.Tuples(nil).Fields()) // Empty tuples.
+	assert.Equal(t, map[string]interface{}{"malformedFields": []interface{}{1, 2}},
+		ctxd.Tuples{1, 2}.Fields()) // String key expected.
+	assert.Equal(t, map[string]interface{}{"malformedFields": []interface{}{"key"}},
+		ctxd.Tuples{"key"}.Fields()) // Key without a value.
+	assert.Equal(t, map[string]interface{}{"malformedFields": []interface{}{"", 123}},
+		ctxd.Tuples{"", 123}.Fields()) // Empty key.
+	assert.Equal(t, map[string]interface{}{"a": 123, "b": 456},
+		ctxd.Tuples{"a", 123, "b", 456}.Fields()) // All good.
 }
