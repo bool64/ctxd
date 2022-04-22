@@ -117,6 +117,10 @@ func (wse wrappedStructuredError) Unwrap() error {
 
 // Fields creates a map from key-value pairs.
 func (t Tuples) Fields() map[string]interface{} {
+	if len(t) == 0 {
+		return nil
+	}
+
 	result := make(map[string]interface{}, len(t))
 
 	var (
@@ -127,7 +131,7 @@ func (t Tuples) Fields() map[string]interface{} {
 	for i, l := range t {
 		if label == "" {
 			label, ok = l.(string)
-			if !ok {
+			if !ok || label == "" {
 				result["malformedFields"] = []interface{}(t[i:])
 
 				break
@@ -136,6 +140,10 @@ func (t Tuples) Fields() map[string]interface{} {
 			result[label] = l
 			label = ""
 		}
+	}
+
+	if label != "" {
+		result["malformedFields"] = []interface{}{label}
 	}
 
 	return result
