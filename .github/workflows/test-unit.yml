@@ -117,4 +117,4 @@ jobs:
         run: |
           git fetch origin master
           go install github.com/johejo/go-cover-view@latest
-          go-cover-view -ci github-actions -git-diff-base origin/master
+          go-cover-view -ci github-actions -git-diff-base origin/master -report ./unit.coverprofile
