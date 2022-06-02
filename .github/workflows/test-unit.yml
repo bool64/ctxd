@@ -109,3 +109,12 @@ jobs:
         with:
           file: ./unit.coverprofile
           flags: unittests
+
+
+      - name: Pull request comment
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git fetch origin master
+          go install github.com/johejo/go-cover-view@latest
+          go-cover-view -ci github-actions -git-diff-base origin/master
