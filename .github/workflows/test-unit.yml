@@ -82,12 +82,12 @@ jobs:
         if: matrix.go-version == env.COV_GO_VERSION && github.event.pull_request.base.sha != ''
         run: |
           git fetch origin master ${{ github.event.pull_request.base.sha }}
-          curl -sLO https://github.com/vearutop/gocovdiff/releases/download/v1.3.0/linux_amd64.tar.gz && tar xf linux_amd64.tar.gz && echo "c5fa13a6bce4e2c1960941f13e32429d8e05c909d4a08e41c46b83b72b162374  gocovdiff" | shasum -c
+          curl -sLO https://github.com/vearutop/gocovdiff/releases/download/v1.3.1/linux_amd64.tar.gz && tar xf linux_amd64.tar.gz && echo "61dd2fc6b517df8110e3975c97569582c48d710af816fee423eb52c7f31b301b  gocovdiff" | shasum -c
           REP=$(./gocovdiff -cov unit.coverprofile -gha-annotations gha-unit.txt -delta-cov-file delta-cov-unit.txt -target-delta-cov ${TARGET_DELTA_COV})
           echo "${REP}"
           REP="${REP//$'\n'/%0A}"
           cat gha-unit.txt
-          DIFF=$(test -e unit-base.txt && (gocovdiff -func-cov unit.txt -func-base-cov unit-base.txt) || echo "Missing base coverage file")
+          DIFF=$(test -e unit-base.txt && (./gocovdiff -func-cov unit.txt -func-base-cov unit-base.txt) || echo "Missing base coverage file")
           TOTAL=$(cat delta-cov-unit.txt)
           echo "::set-output name=rep::$REP"
           echo "::set-output name=diff::$DIFF"
@@ -112,9 +112,8 @@ jobs:
 
             <details><summary>Coverage diff with base branch</summary>
 
-            ```diff
             ${{ steps.annotate.outputs.diff }}
-            ```
+ 
             </details>
 
       - name: Store base coverage
