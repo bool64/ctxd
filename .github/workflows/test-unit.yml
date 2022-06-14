@@ -84,6 +84,9 @@ jobs:
         run: |
           make test-unit
           go tool cover -func=./unit.coverprofile > unit.txt
+          TOTAL=$(grep 'total:' unit.txt)
+          echo "${TOTAL}"
+          echo "::set-output name=total::$TOTAL"
 
       - name: Annotate missing test coverage
         id: annotate
