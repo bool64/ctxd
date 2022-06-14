@@ -3,7 +3,7 @@ module github.com/bool64/ctxd
 go 1.17
 
 require (
-	github.com/bool64/dev v0.2.5
+	github.com/bool64/dev v0.2.14-0.20220614211400-7423b05b32f6
 	github.com/stretchr/testify v1.7.1
 	github.com/swaggest/usecase v1.1.2
 )
