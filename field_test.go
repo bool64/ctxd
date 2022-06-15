@@ -9,8 +9,6 @@ import (
 
 func TestDeferredString_String(t *testing.T) {
 	assert.Equal(t, "[1 2 3]", ctxd.DeferredString(func() interface{} { return []int{1, 2, 3} }).String())
-
-	assert.Panics(t, func() { _ = ctxd.DeferredString(nil).String() })
 }
 
 func TestDeferredJSON_MarshalJSON(t *testing.T) {
