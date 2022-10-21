@@ -87,7 +87,7 @@ func WrapError(ctx context.Context, err error, message string, keysAndValues ...
 //
 // LogError fields from context are also added to error structured data.
 func NewError(ctx context.Context, message string, keysAndValues ...interface{}) error {
-	// nolint:goerr113 // Static errors can be used with WrapError.
+	//nolint:goerr113 // Static errors can be used with WrapError.
 	err := errors.New(message)
 
 	se, ok := newError(ctx, err, keysAndValues...)
@@ -236,6 +236,8 @@ func (se structuredError) MarshalJSON() ([]byte, error) {
 }
 
 // SentinelError is a constant error.
+//
+// See https://dave.cheney.net/2016/04/07/constant-errors for more details.
 type SentinelError string
 
 // Error returns error message.
@@ -299,4 +301,65 @@ func (le labeledError) As(v interface{}) bool {
 // Unwrap returns original error.
 func (le labeledError) Unwrap() error {
 	return le.err
+}
+
+// MultiError creates an error with multiple unwrappables.
+//
+// Secondary errors could be checked with errors.Is, errors.As.
+// Error message remains the same with primary error.
+//
+// Multi errors can be used to augment error with multiple
+// checkable perks, without a limitation of single wrapping inheritance.
+func MultiError(primary error, secondary ...error) error {
+	return multi{
+		primary:   primary,
+		secondary: secondary,
+	}
+}
+
+type multi struct {
+	primary   error
+	secondary []error
+}
+
+// Error returns message.
+func (le multi) Error() string {
+	return le.primary.Error()
+}
+
+// Is returns true if err matches primary error or any of secondary.
+func (le multi) Is(err error) bool {
+	if errors.Is(le.primary, err) {
+		return true
+	}
+
+	for _, l := range le.secondary {
+		if errors.Is(err, l) {
+			return true
+		}
+	}
+
+	return false
+}
+
+// As returns true if primary error or any of secondary can be assigned to v.
+//
+// If multiple assignations are possible, only first one is performed.
+func (le multi) As(v interface{}) bool {
+	if errors.As(le.primary, v) {
+		return true
+	}
+
+	for _, l := range le.secondary {
+		if errors.As(l, v) {
+			return true
+		}
+	}
+
+	return false
+}
+
+// Unwrap returns primary error.
+func (le multi) Unwrap() error {
+	return le.primary
 }
