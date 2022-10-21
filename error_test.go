@@ -259,3 +259,26 @@ func TestTuples_Fields(t *testing.T) {
 	assert.Equal(t, map[string]interface{}{"a": 123, "b": 456},
 		ctxd.Tuples{"a", 123, "b", 456}.Fields()) // All good.
 }
+
+func TestNewMulti(t *testing.T) {
+	errPrimary := errors.New("failed")
+	errSecondary1 := ctxd.SentinelError("miserably")
+	errSecondary2 := ctxd.SentinelError("hopelessly")
+	errSecondary3 := ctxd.SentinelError("deadly")
+
+	err := ctxd.MultiError(fmt.Errorf("oops: %w", errPrimary), errSecondary1, errSecondary2)
+
+	assert.True(t, errors.Is(err, errPrimary))
+	assert.True(t, errors.Is(err, errSecondary1))
+	assert.True(t, errors.Is(err, errSecondary2))
+	assert.False(t, errors.Is(err, errSecondary3))
+
+	// Labels do not implicitly contribute to error message.
+	assert.Equal(t, "oops: failed", err.Error())
+
+	// If there are two matches, only first is returned.
+	var errSentinel ctxd.SentinelError
+
+	assert.True(t, errors.As(err, &errSentinel))
+	assert.Equal(t, "miserably", string(errSentinel))
+}
