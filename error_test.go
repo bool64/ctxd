@@ -260,7 +260,7 @@ func TestTuples_Fields(t *testing.T) {
 		ctxd.Tuples{"a", 123, "b", 456}.Fields()) // All good.
 }
 
-func TestNewMulti(t *testing.T) {
+func TestMultiError(t *testing.T) {
 	errPrimary := errors.New("failed")
 	errSecondary1 := ctxd.SentinelError("miserably")
 	errSecondary2 := ctxd.SentinelError("hopelessly")
@@ -281,4 +281,9 @@ func TestNewMulti(t *testing.T) {
 
 	assert.True(t, errors.As(err, &errSentinel))
 	assert.Equal(t, "miserably", string(errSentinel))
+}
+
+func TestMultiError_invalid(t *testing.T) {
+	assert.Equal(t, "empty multi error", ctxd.MultiError(nil).Error())
+	assert.Equal(t, "secondary fail", ctxd.MultiError(nil, errors.New("secondary fail")).Error())
 }

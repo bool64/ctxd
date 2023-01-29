@@ -324,6 +324,14 @@ type multi struct {
 
 // Error returns message.
 func (le multi) Error() string {
+	if le.primary == nil {
+		if len(le.secondary) > 0 {
+			return le.secondary[0].Error()
+		}
+
+		return "empty multi error"
+	}
+
 	return le.primary.Error()
 }
 
